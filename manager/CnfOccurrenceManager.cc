@@ -175,7 +175,8 @@ int CnfOccurrenceManager::computeConnectedComponent(vec< vec<Var> > &varCo, vec<
       idxComponent[setOfVar[i]] = 0;
     }
 
-  return nbComponent;
+  return nbComponent; 
+  // TODO: try to understand when nbComponent == 0
 }// computeConnectedComponent
 
 

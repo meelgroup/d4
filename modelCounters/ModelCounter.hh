@@ -179,8 +179,12 @@ private:
       }
 
     Var v = var_Undef;
+    // this is important for stable model counting
+    // if (priorityVar.size() == 0) {
+    //   return 0
+    // }
     if(priorityVar.size()) v = vs->selectVariable(priorityVar); else v = vs->selectVariable(connected);
-    if(v == var_Undef) return 1;
+    if(v == var_Undef) return 1; 
 
     Lit l = mkLit(v, optReversePolarity - vs->selectPhase(v));
     nbDecisionNode++;
