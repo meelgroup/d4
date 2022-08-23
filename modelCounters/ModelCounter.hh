@@ -446,11 +446,15 @@ public:
     vec<Lit> unitsLit;
 
     for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
+    cout << "The set of projection variables is: ";
     for(int i = 0 ; i<s.nVars() ; i++) {
       if (vs->isProjected(i)) {
+        // copying the projection variables
         priorityVar.push(i);
+        cout << i+1 << " ";
       }
     }
+    cout << endl;
     T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
 
     if(verb) printFinalStatsCache();

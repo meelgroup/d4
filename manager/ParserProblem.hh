@@ -24,9 +24,9 @@
 class ParserProblem
 {
 public:
-  int parseCNF(char *benchName, vec<vec<Lit> > &clauses, bool verb = true);
+  int parseCNF(char *benchName, vec<vec<Lit> > &clauses, vec<bool> &isProjectedVar, bool verb = true);
   void parseWeight(const char *fileWeights, vec<double> &weightLit, int nbVar);  
-  int parseProblem(char *benchName, const char *fileWeights, vec<vec<Lit> > &clauses, vec<double> &weightLit, bool verb = true);
+  int parseProblem(char *benchName, const char *fileWeights, vec<vec<Lit> > &clauses, vec<bool> &isProjectedVar, vec<double> &weightLit, bool verb = true);
 };
 
 #endif
