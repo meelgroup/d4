@@ -171,7 +171,7 @@ int CnfOccurrenceManager::computeConnectedComponent(vec< vec<Var> > &varCo, vec<
           notFreeVar.push(setOfVar[i]);
         }
       if(!idxComponent[setOfVar[i]] && currentValue[setOfVar[i]] == l_Undef) freeVar.push(setOfVar[i]);
-
+      // !idxComponent[setOfVar[i]] case means that setOfVar[i] is unit propagated, my opinion
       idxComponent[setOfVar[i]] = 0;
     }
 

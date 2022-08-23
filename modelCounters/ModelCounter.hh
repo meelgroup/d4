@@ -107,6 +107,20 @@ private:
         currPriority.push(priorityVar[i]);
   } // computePrioritySet
 
+  /**
+     Check the current priority set.
+   */
+  inline bool hasPriorityVariables(vec<Var> &connected, vec<Var> &priorityVar)
+  {
+    stampIdx++;
+    for(int i = 0 ; i<connected.size() ; i++) stampVar[connected[i]] = stampIdx;
+    for(int i = 0 ; i<priorityVar.size() ; i++)
+      if(stampVar[priorityVar[i]] == stampIdx && s.value(priorityVar[i]) == l_Undef)
+        return true; // there are intersections
+
+    return false;
+  } // hasPriorityVariables
+
 
   /**
      Call the CNF formula into a D-FPiBDD.
@@ -132,7 +146,18 @@ private:
     vec<Var> reallyPresent;
     vec< vec<Var> > varConnected;
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
-
+    bool earlyReject = false;
+    if (earlyReject) {
+      bool hasIntersection = true;
+      for(int cp = 0 ; cp<nbComponent ; cp++) {
+        vec<Var> &connected = varConnected[cp];
+        hasIntersection &= hasPriorityVariables(connected, priorityVar);
+      }
+      if (!hasIntersection) {
+        occManager->postUpdate(unitsLit); // I think it should be there
+        return 0; // the number of stable models is 0
+      }
+    }
     T ret = 1, curr;
     if(nbComponent)
       {
@@ -184,6 +209,15 @@ private:
     //   return 0
     // }
     if(priorityVar.size()) v = vs->selectVariable(priorityVar); else v = vs->selectVariable(connected);
+    // cout << "priorityVar.size(): " << priorityVar.size() << endl;
+    // for (int i = 0; i < priorityVar.size() ; i++) {
+    //   cout << priorityVar[i] << " ";
+    // }
+
+    if(priorityVar.size() == 0 && connected.size() > 0) {
+      // it is the special base cases
+      return 0;
+    }
     if(v == var_Undef) return 1; 
 
     Lit l = mkLit(v, optReversePolarity - vs->selectPhase(v));
@@ -412,6 +446,11 @@ public:
     vec<Lit> unitsLit;
 
     for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
+    for(int i = 0 ; i<s.nVars() ; i++) {
+      if (vs->isProjected(i)) {
+        priorityVar.push(i);
+      }
+    }
     T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
 
     if(verb) printFinalStatsCache();
