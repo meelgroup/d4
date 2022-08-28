@@ -134,7 +134,8 @@ private:
   */
   T computeNbModel_(vec<Var> &setOfVar, vec<Lit> &unitsLit, vec<Var> &freeVariable, vec<Var> &priorityVar)
   {
-    showRun(); nbCallCall++;
+    // disable the output
+    // showRun(); nbCallCall++;
     s.rebuildWithConnectedComponent(setOfVar);
 
     if(!s.solveWithAssumptions()) return 0;
@@ -146,7 +147,7 @@ private:
     vec<Var> reallyPresent;
     vec< vec<Var> > varConnected;
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
-    bool earlyReject = false;
+    bool earlyReject = true;
     if (earlyReject) {
       bool hasIntersection = true;
       for(int cp = 0 ; cp<nbComponent ; cp++) {
