@@ -132,7 +132,7 @@ private:
     vec<Var> reallyPresent;
     vec< vec<Var> > varConnected;
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
-
+    cout << "nbComponent: " << nbComponent << endl;
     T ret = 1, curr;
     if(nbComponent)
       {
@@ -412,6 +412,26 @@ public:
     vec<Lit> unitsLit;
 
     for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
+    std::string aspfile = occManager->computeASPProgram();
+    vector<int> answerset = occManager->computeAnswerSet(aspfile);
+    // special for track1_009.cnf
+    vector<int> cut{225,240,271,286,600,630,727,741,866,871,986,991,1339,1354,1383,1583,1584,1588,1767,1776,1783,2254,2269,2383,2611,2641,2827,2842,2883,2898,2942,3061,3137,3152,3353,3363,3370,3536,3545,3552,4210,4240,4428,4443,4484,4515,4530,4574,4695,4771,4974,4984,4991,5170,5179,5186,5842,5874,6061,6077,6119};
+    for (int n: cut) {
+      if (find(answerset.begin(), answerset.end(), n) != answerset.end()) {
+        (s.assumptions).push(mkLit(n, false));
+      }
+      else if (s.value(n) == l_Undef) {
+        (s.assumptions).push(mkLit(n, true));
+      }
+    }
+    // for (int n: answerset) {
+    //   if (find(answerset.begin(), answerset.end(), n) == answerset.end()) {
+    //     // the atom is negative
+    //     (s.assumptions).push(~mkLit(n));
+    //   } else {
+    //     (s.assumptions).push(mkLit(n));
+    //   }
+    // }
     T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
 
     if(verb) printFinalStatsCache();

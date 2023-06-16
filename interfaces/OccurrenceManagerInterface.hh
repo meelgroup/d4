@@ -20,6 +20,7 @@
 
 #include "../utils/SolverTypes.hh"
 #include "../utils/Solver.hh"
+#include <vector>
 
 class OccurrenceManagerInterface
 {
@@ -60,6 +61,8 @@ public:
   virtual void initialize(vec<Var> &setOfVar, vec<Lit> &units) = 0;
   virtual void showOccurenceList() {}
   virtual void showFormula(){}
+  virtual std::string computeASPProgram(){}
+  virtual std::vector<int> computeAnswerSet(std::string aspfile){}
   virtual void initFormula(vec<vec<Lit> > &_clauses) = 0;
   virtual void debug(Solver &s){}
 

@@ -125,6 +125,62 @@ public:
     for(int i = 0 ; i<clauses.size() ; i++) showListLit(clauses[i]);
   }// showFormula
 
+  std::string computeASPProgram() 
+  {
+    printf("Computing equivalent ASP program\n");
+    ofstream myfile;
+    string aspfile = "asp.lp";
+    myfile.open(aspfile);
+    std::string body_str, head_str;
+
+    for(int i = 0 ; i<clauses.size() ; i++) {
+      body_str.clear();
+      head_str.clear();
+      for(int j = 0 ; j<clauses[i].size() ; j++) {
+        if (sign(clauses[i][j])) {
+          if (body_str.size() == 0) {
+            body_str = "v" + to_string(var(clauses[i][j]));
+          } else {
+            body_str += ",v" + to_string(var(clauses[i][j]));
+          }
+        } else {
+          if (head_str.size() == 0) {
+            head_str = "v" + to_string(var(clauses[i][j]));
+          } else {
+            head_str += ";v" + to_string(var(clauses[i][j]));
+          }
+        }
+      }
+      myfile << head_str << ":-" << body_str << "." << endl;
+    }
+    myfile.close();
+    return aspfile;
+  }
+  vector<int> computeAnswerSet(string aspfile) {
+    std::vector<int> as;
+    // running clingo to compute minimal models
+    system(string("clingo " + aspfile + "> result_" + aspfile).c_str());
+    ifstream resultfile("result_" + aspfile);
+    string line; 
+    while (getline (resultfile, line)) {
+      if (line.find("v") == 0) {
+        size_t pos = 0;
+        std::string token;
+        std::string delimiter = " ";
+        int atom = 0;
+        while ((pos = line.find(delimiter)) != std::string::npos) {
+          token = line.substr(0, pos);
+          atom = stoi(token.substr(1));
+          as.push_back(atom);
+          line.erase(0, pos + delimiter.length());
+        }
+        atom = stoi(line.substr(1));
+        as.push_back(atom);
+      }
+    }
+    return as;
+  }
+
 
   inline int getNbBinaryClause(Var v){return getNbBinaryClause(mkLit(v, false)) + getNbBinaryClause(mkLit(v, true));}
   inline int getNbNotBinaryClause(Lit l){return getNbClause(l) - getNbBinaryClause(l);}
