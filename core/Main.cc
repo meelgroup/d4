@@ -263,8 +263,9 @@ int main(int argc, char** argv)
   vec<double> weightLit;
 
   ParserProblem p;
-  int nbVar = p.parseProblem(argv[1], fileWeights, clauses, weightLit);
-  parseProjectedVariable(fileP, nbVar, isProjectedVar);
+  int nbVar = p.parseProblem(argv[1], fileWeights, clauses, isProjectedVar, weightLit);
+  // we are taking the projection from a new file
+  // parseProjectedVariable(fileP, nbVar, isProjectedVar);
 
   assert(isProjectedVar.size() >= nbVar);
 

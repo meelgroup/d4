@@ -124,6 +124,20 @@ template <class T> class DDnnfCompiler
   }// manageUnsat
 
   /**
+     Check the current priority set.
+   */
+  inline bool hasPriorityVariables(vec<Var> &connected, vec<Var> &priorityVar)
+  {
+    stampIdx++;
+    for(int i = 0 ; i<connected.size() ; i++) stampVar[connected[i]] = stampIdx;
+    for(int i = 0 ; i<priorityVar.size() ; i++)
+      if(stampVar[priorityVar[i]] == stampIdx && s.value(priorityVar[i]) == l_Undef)
+        return true; // there are intersections
+
+    return false;
+  } // hasPriorityVariables
+
+  /**
      Compile the CNF formula into a D-FPiBDD.
 
      @param[in] setOfVar, the current set of considered variables
@@ -157,13 +171,21 @@ template <class T> class DDnnfCompiler
         for(int j = 0 ; j<varConnected[i].size() ; j++) varConnected[0].push(varConnected[i][j]);
       nbComponent = 1;
     }
-
+    // new model counting algorithm 
+    bool hasIntersection = true;
+    for(int cp = 0 ; cp<nbComponent ; cp++) {
+      vec<Var> &connected = varConnected[cp];
+      hasIntersection &= hasPriorityVariables(connected, priorityVar);
+    }
     vec<bool> comeFromCache;
     DAG<T> *ret = NULL;
     if(!nbComponent)
     {
       comeFromCache.push(false);
       ret = globalTrueNode; // tautologie modulo unit literal
+    } else if (!hasIntersection) {
+      comeFromCache.push(false);
+      ret = globalFalseNode; 
     }
     else
     {
@@ -284,6 +306,10 @@ template <class T> class DDnnfCompiler
 
     Var v = var_Undef;
     if(priorityVar.size()) v = vs->selectVariable(priorityVar); else v = vs->selectVariable(connected);
+    else if(priorityVar.size() == 0 && connected.size() > 0) {
+      // it is the special base cases
+      return createFalseNode(connected);
+    }
     if(v == var_Undef) return createTrueNode(connected);
 
     Lit l = mkLit(v, optReversePolarity - vs->selectPhase(v));
@@ -388,6 +414,10 @@ template <class T> class DDnnfCompiler
     return globalTrueNode;
   }// createTrueNode
 
+  inline DAG<T> *createFalseNode(vec<Var> &setOfVar) {
+    return globalFalseNode;
+  }// createFalseNode
+
  public:
   /**
      Constructor of dDNNF compiler.
@@ -489,6 +519,15 @@ template <class T> class DDnnfCompiler
       else
       {
         for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
+        cout << "The set of projection variables is: ";
+        for(int i = 0 ; i<s.nVars() ; i++) {
+          if (vs->isProjected(i)) {
+            // copying the projection variables
+            priorityVar.push(i);
+            cout << i+1 << " ";
+          }
+        }
+        cout << endl;
         d = compile_(setOfVar, priorityVar, lit_Undef, bData, fromCache, idxReason);
       }
 
