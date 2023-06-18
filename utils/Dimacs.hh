@@ -73,7 +73,7 @@ template<class B> static void collectLit(B& in, vec<Lit>& lits)
     }
 }// readClause
 
-template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses) 
+template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses, vec<bool> &isProjectedVar) 
 {
   vec<Lit> lits;
   int vars    = 0;
@@ -91,6 +91,22 @@ template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses)
               nbclauses = parseInt(in);              
             }else printf("PARSE ERROR! Unexpected char: %c\n", *in), exit(3);
         }
+      else if (*in == 'c') { 
+        int parsed_lit, var;  
+        if (isProjectedVar.size() == 0) {
+          for(int i = 0 ; i<vars ; i++) isProjectedVar.push(false);
+        }
+        if(eagerMatch(in, "c ind"))
+          {
+            for (;;)
+            {
+              parsed_lit = parseInt(in);
+              if (parsed_lit == 0) break;
+              var = abs(parsed_lit) - 1;
+              isProjectedVar[var] = true;
+            }     
+          } else printf("PARSE ERROR! Unexpected char: %c\n", *in), exit(3);
+      }
       else if (*in == 'c' || *in == 'p' || *in == 'w') skipLine(in);
       else
         {
@@ -106,10 +122,10 @@ template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses)
 }
  
 // Inserts problem into solver.
-static int parse_DIMACS(gzFile input_stream, vec<vec<Lit> > &clauses) 
+static int parse_DIMACS(gzFile input_stream, vec<vec<Lit> > &clauses, vec<bool> &isProjectedVar) 
 {
   StreamBuffer in(input_stream);
-  return parse_DIMACS_main(in, clauses);
+  return parse_DIMACS_main(in, clauses, isProjectedVar);
 }
 
 #endif

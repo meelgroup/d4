@@ -29,12 +29,12 @@
 #include "../DAG/DAG.hh"
 #include "../manager/ParserProblem.hh"
 
-int ParserProblem::parseCNF(char *benchName, vec<vec<Lit> > &clauses, bool verb)
+int ParserProblem::parseCNF(char *benchName, vec<vec<Lit> > &clauses, vec<bool> &isProjectedVar, bool verb)
 {
   gzFile in = gzopen(benchName, "rb");
   if (in == NULL) printf("ERROR! Could not open file: %s\n", benchName), exit(1);
 
-  int nbVar = parse_DIMACS(in, clauses);
+  int nbVar = parse_DIMACS(in, clauses, isProjectedVar);
 
   gzclose(in);
 
@@ -88,9 +88,9 @@ void ParserProblem::parseWeight(const char *fileWeights, vec<double> &weightLit,
    @param[in] fileWeights, the path where the file containng the literal 's weight can be found
 */
 int ParserProblem::parseProblem(char *benchName, const char *fileWeights, vec<vec<Lit> > &clauses,
-                                vec<double> &weightLit, bool verb)
+                                vec<bool> &isProjectedVar, vec<double> &weightLit, bool verb)
 {
-  int nbVar = parseCNF(benchName, clauses, verb);
+  int nbVar = parseCNF(benchName, clauses, isProjectedVar, verb);
   parseWeight(fileWeights, weightLit, nbVar);
 
   return nbVar;
