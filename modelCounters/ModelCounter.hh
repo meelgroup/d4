@@ -417,19 +417,28 @@ public:
     vec<Lit> unitsLit;
 
     for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
+    cout << "The variables in cut: ";
+    for(int i = 0 ; i<s.nVars() ; i++) {
+      if (vs->isProjected(i)) {
+        // copying the projection variables
+        priorityVar.push(i);
+        cout << i+1 << " ";
+      }
+    }
+    cout << endl;
     occManager->preComputedAS.clear();
     for (int as = 0; as < 3; as++) {
       std::string aspfile = occManager->computeASPProgram();
       vector<int> answerset = occManager->computeAnswerSet(aspfile);
-      // special for track1_009.cnf
-      vector<int> cut{225,240,271,286,600,630,727,741,866,871,986,991,1339,1354,1383,1583,1584,1588,1767,1776,1783,2254,2269,2383,2611,2641,2827,2842,2883,2898,2942,3061,3137,3152,3353,3363,3370,3536,3545,3552,4210,4240,4428,4443,4484,4515,4530,4574,4695,4771,4974,4984,4991,5170,5179,5186,5842,5874,6061,6077,6119};
+      // special for track1_009.cnf (cut is no longer needed)
+      // vector<int> cut{225,240,271,286,600,630,727,741,866,871,986,991,1339,1354,1383,1583,1584,1588,1767,1776,1783,2254,2269,2383,2611,2641,2827,2842,2883,2898,2942,3061,3137,3152,3353,3363,3370,3536,3545,3552,4210,4240,4428,4443,4484,4515,4530,4574,4695,4771,4974,4984,4991,5170,5179,5186,5842,5874,6061,6077,6119};
     
       if (answerset.size() == 0) {
         cout << "Found UNSAT !!!";
         break;
       }
       occManager->preComputedAS.push();
-      for (int n: cut) {
+      for (int n: priorityVar) {
         if (find(answerset.begin(), answerset.end(), n) != answerset.end()) {
           (s.assumptions).push(mkLit(n, false));
           occManager->preComputedAS.last().push("v"+to_string(n));
