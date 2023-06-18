@@ -26,6 +26,7 @@ class OccurrenceManagerInterface
 {
 public:
   vec< vec<int> > occList;
+  vec< vec<std::string>> preComputedAS;
   virtual ~OccurrenceManagerInterface(){}
 
   virtual int getNbBinaryClause(Var v) = 0;

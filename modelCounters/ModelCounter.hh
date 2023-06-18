@@ -133,6 +133,7 @@ private:
     vec< vec<Var> > varConnected;
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
     cout << "nbComponent: " << nbComponent << endl;
+    cout << "The stat of components: ";
     T ret = 1, curr;
     if(nbComponent)
       {
@@ -140,24 +141,28 @@ private:
         for(int cp = 0 ; cp<nbComponent ; cp++)
           {
             vec<Var> &connected = varConnected[cp];
-            bool localCache = optCached;
+            cout << connected.size() << " ";
+            // to disable the counting 
+            // bool localCache = optCached;
 
-            occManager->updateCurrentClauseSet(connected);
-            TmpEntry<T> cb = localCache ? cache->searchInCache(connected, bm) : NULL_CACHE_ENTRY;
+            // occManager->updateCurrentClauseSet(connected);
+            // TmpEntry<T> cb = localCache ? cache->searchInCache(connected, bm) : NULL_CACHE_ENTRY;
 
-            if(localCache && cb.defined) ret *= cb.getValue();
-            else
-            {
-              // recursive call
-              vec<Var> currPriority;
-              computePrioritySubSet(connected, priorityVar, currPriority);
-              ret *= (curr = computeDecisionNode(connected, currPriority));
+            // if(localCache && cb.defined) ret *= cb.getValue();
+            // else
+            // {
+            //   // recursive call
+            //   vec<Var> currPriority;
+            //   computePrioritySubSet(connected, priorityVar, currPriority);
+            //   ret *= (curr = computeDecisionNode(connected, currPriority));
 
-              if(localCache) cache->addInCache(cb, curr);
-            }
-            occManager->popPreviousClauseSet();
+            //   if(localCache) cache->addInCache(cb, curr);
+            // }
+            // occManager->popPreviousClauseSet();
+            // to disable the counting
           }
       }// else we have a tautology
+      cout << endl;
 
     occManager->postUpdate(unitsLit);
     return ret;
@@ -412,18 +417,29 @@ public:
     vec<Lit> unitsLit;
 
     for(int i = 0 ; i<s.nVars() ; i++) setOfVar.push(i);
-    std::string aspfile = occManager->computeASPProgram();
-    vector<int> answerset = occManager->computeAnswerSet(aspfile);
-    // special for track1_009.cnf
-    vector<int> cut{225,240,271,286,600,630,727,741,866,871,986,991,1339,1354,1383,1583,1584,1588,1767,1776,1783,2254,2269,2383,2611,2641,2827,2842,2883,2898,2942,3061,3137,3152,3353,3363,3370,3536,3545,3552,4210,4240,4428,4443,4484,4515,4530,4574,4695,4771,4974,4984,4991,5170,5179,5186,5842,5874,6061,6077,6119};
-    for (int n: cut) {
-      if (find(answerset.begin(), answerset.end(), n) != answerset.end()) {
-        (s.assumptions).push(mkLit(n, false));
+    occManager->preComputedAS.clear();
+    for (int as = 0; as < 3; as++) {
+      std::string aspfile = occManager->computeASPProgram();
+      vector<int> answerset = occManager->computeAnswerSet(aspfile);
+      // special for track1_009.cnf
+      vector<int> cut{225,240,271,286,600,630,727,741,866,871,986,991,1339,1354,1383,1583,1584,1588,1767,1776,1783,2254,2269,2383,2611,2641,2827,2842,2883,2898,2942,3061,3137,3152,3353,3363,3370,3536,3545,3552,4210,4240,4428,4443,4484,4515,4530,4574,4695,4771,4974,4984,4991,5170,5179,5186,5842,5874,6061,6077,6119};
+    
+      if (answerset.size() == 0) {
+        cout << "Found UNSAT !!!";
+        break;
       }
-      else if (s.value(n) == l_Undef) {
-        (s.assumptions).push(mkLit(n, true));
+      occManager->preComputedAS.push();
+      for (int n: cut) {
+        if (find(answerset.begin(), answerset.end(), n) != answerset.end()) {
+          (s.assumptions).push(mkLit(n, false));
+          occManager->preComputedAS.last().push("v"+to_string(n));
+        }
+        else if (s.value(n) == l_Undef) {
+          (s.assumptions).push(mkLit(n, true));
+          occManager->preComputedAS.last().push("not v"+to_string(n));
+          // check whether the logic is correct
+        }
       }
-    }
     // for (int n: answerset) {
     //   if (find(answerset.begin(), answerset.end(), n) == answerset.end()) {
     //     // the atom is negative
@@ -432,7 +448,8 @@ public:
     //     (s.assumptions).push(mkLit(n));
     //   }
     // }
-    T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
+      T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
+    }
 
     if(verb) printFinalStatsCache();
 

@@ -153,6 +153,19 @@ public:
       }
       myfile << head_str << ":-" << body_str << "." << endl;
     }
+    // here are precomputed answer sets
+    for (int index = 0; index < preComputedAS.size(); index++) {
+      std::string body_str = ":- ";
+      for (int first = 0; auto atom: preComputedAS[index]) {
+        if (first == 0) {
+          body_str += atom; 
+        } else {
+          body_str += (", " + atom); 
+        }
+        first++;
+      }
+      body_str += "."
+    }
     myfile.close();
     return aspfile;
   }
