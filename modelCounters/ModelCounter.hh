@@ -438,14 +438,14 @@ public:
         break;
       }
       occManager->preComputedAS.push();
-      for (int n: priorityVar) {
-        if (find(answerset.begin(), answerset.end(), n) != answerset.end()) {
-          (s.assumptions).push(mkLit(n, false));
-          occManager->preComputedAS.last().push("v"+to_string(n));
+      for(int i = 0 ; i<priorityVar.size() ; i++) {
+        if (find(answerset.begin(), answerset.end(), priorityVar[i]) != answerset.end()) {
+          (s.assumptions).push(mkLit(priorityVar[i], false));
+          occManager->preComputedAS.last().push("v"+to_string(priorityVar[i]));
         }
-        else if (s.value(n) == l_Undef) {
-          (s.assumptions).push(mkLit(n, true));
-          occManager->preComputedAS.last().push("not v"+to_string(n));
+        else if (s.value(priorityVar[i]) == l_Undef) {
+          (s.assumptions).push(mkLit(priorityVar[i], true));
+          occManager->preComputedAS.last().push("not v"+to_string(priorityVar[i]));
           // check whether the logic is correct
         }
       }
@@ -468,7 +468,7 @@ public:
     for(int i = 0 ; i<unitsLit.size() ; i++)
       if(vs->isProjected(var(unitsLit[i]))) computeWeight *= T(weightLit[toInt(unitsLit[i])]);
 
-    return d * computeWeight;
+    return computeWeight;
   }// computeNbModel
 
 

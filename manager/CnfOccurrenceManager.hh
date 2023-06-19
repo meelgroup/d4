@@ -156,7 +156,9 @@ public:
     // here are precomputed answer sets
     for (int index = 0; index < preComputedAS.size(); index++) {
       std::string body_str = ":- ";
-      for (int first = 0; auto atom: preComputedAS[index]) {
+      int first = 0; 
+      for (int j = 0; j < preComputedAS[index].size(); j++) {
+        std::string atom = preComputedAS[index][j];
         if (first == 0) {
           body_str += atom; 
         } else {
@@ -164,7 +166,7 @@ public:
         }
         first++;
       }
-      body_str += "."
+      body_str += ".";
     }
     myfile.close();
     return aspfile;
