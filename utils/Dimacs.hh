@@ -93,11 +93,11 @@ template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses, v
         }
       else if (*in == 'c') { 
         int parsed_lit, var;  
-        if (isProjectedVar.size() == 0) {
-          for(int i = 0 ; i<vars ; i++) isProjectedVar.push(false);
-        }
         if(eagerMatch(in, "c ind"))
           {
+            if (isProjectedVar.size() == 0) {
+              for(int i = 0 ; i<vars ; i++) isProjectedVar.push(false);
+            }
             for (;;)
             {
               parsed_lit = parseInt(in);
@@ -105,7 +105,10 @@ template<class B> static int parse_DIMACS_main(B& in, vec<vec<Lit> > &clauses, v
               var = abs(parsed_lit) - 1;
               isProjectedVar[var] = true;
             }     
-          } else printf("PARSE ERROR! Unexpected char: %c\n", *in), exit(3);
+          } // else printf("PARSE ERROR1! Unexpected char: %c\n", *in), exit(3);
+          else {
+            skipLine(in);
+          }
       }
       else if (*in == 'c' || *in == 'p' || *in == 'w') skipLine(in);
       else

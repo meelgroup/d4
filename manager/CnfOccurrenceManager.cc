@@ -280,6 +280,7 @@ void CnfOccurrenceManager::updateCurrentClauseSet(vec<Var> &component)
 
   for(int i = 0 ; i<currentSize ; i++) assert(!nbSat[currentIdx[i]]);
   for(int i = 0 ; i<component.size() ; i++) inCurrentComponent[component[i]] = false;
+  std::cout << "(" << currentSize << ") ";
 }// updatecurrentclauseset
 
 

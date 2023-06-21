@@ -145,7 +145,7 @@ private:
             // to disable the counting 
             // bool localCache = optCached;
 
-            // occManager->updateCurrentClauseSet(connected);
+            occManager->updateCurrentClauseSet(connected);
             // TmpEntry<T> cb = localCache ? cache->searchInCache(connected, bm) : NULL_CACHE_ENTRY;
 
             // if(localCache && cb.defined) ret *= cb.getValue();
