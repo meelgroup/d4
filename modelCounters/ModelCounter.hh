@@ -437,18 +437,24 @@ public:
         cout << "Found UNSAT !!!";
         break;
       }
-      occManager->preComputedAS.push();
+      
+      vector<std::string> com;
+      com.clear();
+      int number_of_push = 0;
       for(int i = 0 ; i<priorityVar.size() ; i++) {
         if (find(answerset.begin(), answerset.end(), priorityVar[i]) != answerset.end()) {
           (s.assumptions).push(mkLit(priorityVar[i], false));
-          occManager->preComputedAS.last().push("v"+to_string(priorityVar[i]));
+          number_of_push++;
+          com.push_back("v"+to_string(priorityVar[i]));
         }
         else if (s.value(priorityVar[i]) == l_Undef) {
           (s.assumptions).push(mkLit(priorityVar[i], true));
-          occManager->preComputedAS.last().push("not v"+to_string(priorityVar[i]));
+          number_of_push++;
+          com.push_back("not v"+to_string(priorityVar[i]));
           // check whether the logic is correct
         }
       }
+      occManager->preComputedAS.push_back(com);
     // for (int n: answerset) {
     //   if (find(answerset.begin(), answerset.end(), n) == answerset.end()) {
     //     // the atom is negative
@@ -458,6 +464,11 @@ public:
     //   }
     // }
       T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
+      while (number_of_push > 0) {
+        number_of_push--;
+        (s.assumptions).pop();
+      }
+      (s.cancelUntil)((s.assumptions).size());
     }
 
     if(verb) printFinalStatsCache();

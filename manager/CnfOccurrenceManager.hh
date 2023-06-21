@@ -167,6 +167,7 @@ public:
         first++;
       }
       body_str += ".";
+      myfile << body_str << endl;
     }
     myfile.close();
     return aspfile;
