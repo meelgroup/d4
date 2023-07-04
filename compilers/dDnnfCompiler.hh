@@ -306,7 +306,7 @@ template <class T> class DDnnfCompiler
 
     Var v = var_Undef;
     if(priorityVar.size()) v = vs->selectVariable(priorityVar); else v = vs->selectVariable(connected);
-    else if(priorityVar.size() == 0 && connected.size() > 0) {
+    if(priorityVar.size() == 0 && connected.size() > 0) {
       // it is the special base cases
       return createFalseNode(connected);
     }
