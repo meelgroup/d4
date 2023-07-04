@@ -134,6 +134,44 @@ private:
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
     cout << "nbComponent: " << nbComponent << endl;
     cout << "The stat of components: ";
+    int nrvars = 0;
+    for(int cp = 0 ; cp<nbComponent ; cp++) {
+      nrvars += varConnected[cp].size();
+    }
+    int thresh = nrvars / 2;
+    int ubound = varConnected.size();
+    while (thresh > 0)
+    {
+      int max_con = 0;
+      int max_index = 0;
+      for (int cp = 0 ; cp<ubound ; cp++) {
+        if (varConnected[cp].size() > max_con) {
+          max_con = varConnected[cp].size();
+          max_index = cp;
+        }
+      }
+      thresh = thresh - max_con;
+      // swap the index
+      vec<Var> &connected = varConnected[max_index];
+      varConnected[max_index] = varConnected[ubound - 1];
+      varConnected[ubound - 1] = connected;
+      ubound--;
+    }
+    int first_half = 0;
+    vec<Var> first;
+    vec<Var> second;
+    for (int cp = 0 ; cp<nbComponent ; cp++) {
+      if (cp < ubound) {
+        for (auto v: varConnected[cp]) {
+          first.push(v);
+        }
+      } else {
+        for (auto v: varConnected[cp]) {
+          second.push(v);
+        }
+      }
+    }
+    cout << "First half: " << first.size() << " and second half: " << second.size() << endl;
     T ret = 1, curr;
     if(nbComponent)
       {
