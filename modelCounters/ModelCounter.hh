@@ -22,6 +22,7 @@
 #include <fstream>
 #include <errno.h>
 #include <cstring>
+#include <unordered_set>
 
 #include <signal.h>
 #include <zlib.h>
@@ -139,39 +140,44 @@ private:
       nrvars += varConnected[cp].size();
     }
     int thresh = nrvars / 2;
+    unordered_set<int> first_par;
     int ubound = varConnected.size();
     while (thresh > 0)
     {
       int max_con = 0;
       int max_index = 0;
       for (int cp = 0 ; cp<ubound ; cp++) {
-        if (varConnected[cp].size() > max_con) {
-          max_con = varConnected[cp].size();
-          max_index = cp;
+        if (first_par.find(cp) == first_par.end()) {
+          if (varConnected[cp].size() > max_con) {
+            max_con = varConnected[cp].size();
+            max_index = cp;
+          }
         }
       }
       thresh = thresh - max_con;
       // swap the index
-      vec<Var> &connected = varConnected[max_index];
-      varConnected[max_index] = varConnected[ubound - 1];
-      varConnected[ubound - 1] = connected;
-      ubound--;
+      // vec<Var> &connected = varConnected[max_index];
+      // varConnected[max_index] = varConnected[ubound - 1];
+      // varConnected[ubound - 1] = connected;
+      // ubound--;
+      first_par.insert(max_index);
     }
     int first_half = 0;
     vec<Var> first;
     vec<Var> second;
     for (int cp = 0 ; cp<nbComponent ; cp++) {
-      if (cp < ubound) {
-        for (auto v: varConnected[cp]) {
-          first.push(v);
+      if (first_par.find(cp) == first_par.end()) {
+        for (int i = 0; i < varConnected[cp].size(); i++) {
+          first.push(varConnected[cp][i]);
         }
       } else {
-        for (auto v: varConnected[cp]) {
-          second.push(v);
+        for (int i = 0; i < varConnected[cp].size(); i++) {
+          second.push(varConnected[cp][i]);
         }
       }
     }
     cout << "First half: " << first.size() << " and second half: " << second.size() << endl;
+    vec<Var> idxClauses;
     T ret = 1, curr;
     if(nbComponent)
       {
@@ -182,8 +188,11 @@ private:
             cout << connected.size() << " ";
             // to disable the counting 
             // bool localCache = optCached;
-
+            idxClauses.clear();
             occManager->updateCurrentClauseSet(connected);
+            occManager->getCurrentClauses(idxClauses, connected);
+            cout << "Number of clauses: " << idxClauses.size() << " " << endl;
+            idxClauses.clear();
             // TmpEntry<T> cb = localCache ? cache->searchInCache(connected, bm) : NULL_CACHE_ENTRY;
 
             // if(localCache && cb.defined) ret *= cb.getValue();
@@ -196,7 +205,7 @@ private:
 
             //   if(localCache) cache->addInCache(cb, curr);
             // }
-            // occManager->popPreviousClauseSet();
+            occManager->popPreviousClauseSet();
             // to disable the counting
           }
       }// else we have a tautology
