@@ -64,6 +64,9 @@ public:
   virtual void showFormula(){}
   virtual std::string computeASPProgram(){}
   virtual std::vector<int> computeAnswerSet(std::string aspfile){}
+  void addConditioning(std::string aspfile) {}
+  void addProject(std::string aspfile, vec<Var> projVar) {}
+  uint64_t enumerateAnswerSets(string aspfile) {}
   virtual void initFormula(vec<vec<Lit> > &_clauses) = 0;
   virtual void debug(Solver &s){}
 

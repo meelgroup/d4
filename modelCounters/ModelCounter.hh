@@ -188,11 +188,13 @@ private:
             cout << connected.size() << " ";
             // to disable the counting 
             // bool localCache = optCached;
-            idxClauses.clear();
-            occManager->updateCurrentClauseSet(connected);
-            occManager->getCurrentClauses(idxClauses, connected);
-            cout << "Number of clauses: " << idxClauses.size() << " " << endl;
-            idxClauses.clear();
+            
+            // idxClauses.clear();
+            // occManager->updateCurrentClauseSet(connected);
+            // occManager->getCurrentClauses(idxClauses, connected);
+            // cout << "Number of clauses: " << idxClauses.size() << " " << endl;
+            // idxClauses.clear();
+
             // TmpEntry<T> cb = localCache ? cache->searchInCache(connected, bm) : NULL_CACHE_ENTRY;
 
             // if(localCache && cb.defined) ret *= cb.getValue();
@@ -208,11 +210,25 @@ private:
             occManager->popPreviousClauseSet();
             // to disable the counting
           }
+          std::string aspfile = occManager->computeASPProgram();
+          // no need to add the previously computed AS
+          occManager->addConditioning(aspfile);
+          occManager->addProject(aspfile, first);   // minimal models w.r.t. first set of variables
+          T n1 = occManager->enumerateAnswerSets(aspfile);
+          cout << "nModels1: " << n1 << endl;
+
+          aspfile = occManager->computeASPProgram();
+          // no need to add the previously computed AS
+          occManager->addConditioning(aspfile);
+          occManager->addProject(aspfile, second);  // minimal models w.r.t. second set of variables
+          T n2 = occManager->enumerateAnswerSets(aspfile);
+          cout << "nModels2: " << n2 << endl;
+
       }// else we have a tautology
       cout << endl;
 
     occManager->postUpdate(unitsLit);
-    return ret;
+    return n1 * n2;
   }// computeNbModel_
 
   /**
@@ -511,6 +527,7 @@ public:
     //   }
     // }
       T d = computeNbModel_(setOfVar, unitsLit, freeVariable, priorityVar);
+      cout << "Conditioning on " << as << ": models " << d << endl;
       while (number_of_push > 0) {
         number_of_push--;
         (s.assumptions).pop();

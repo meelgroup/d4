@@ -41,6 +41,8 @@ protected:
   int currentSize;
   vec<int> stackSize;
   vec<bool> inCurrentComponent;
+  string clingo_cmd = "clingo ";
+  uint64_t thresh = 1000000;
 
   inline void showOccurenceList()
   {
@@ -175,7 +177,7 @@ public:
   vector<int> computeAnswerSet(string aspfile) {
     std::vector<int> as;
     // running clingo to compute minimal models
-    system(string("clingo " + aspfile + "> result_" + aspfile).c_str());
+    system(string(clingo_cmd + aspfile + "> result_" + aspfile).c_str());
     ifstream resultfile("result_" + aspfile);
     string line; 
     while (getline (resultfile, line)) {
@@ -195,6 +197,51 @@ public:
       }
     }
     return as;
+  }
+
+  void addConditioning(string aspfile) {
+    ofstream myfile;
+    myfile.open(aspfile);
+    std::string body_str, head_str;
+    int index_con = preComputedAS.size() - 1;
+    for (int i = 0; i < preComputedAS[index_con].size(); i++) {
+      myfile << "not " << preComputedAS[index_con][i] << "." << endl;
+    }
+    myfile.close();
+    return;
+  }
+
+  void addProject(string aspfile, vec<Var> projSet) {
+    ofstream myfile;
+    myfile.open(aspfile);
+    std::string body_str, head_str;
+    for (int i = 0; i < projSet.size(); i++) {
+      myfile << "#project " << "v" + to_string(projSet[i]) << "." << endl;
+    }
+    myfile.close();
+    return;
+  }
+
+  uint64_t enumerateAnswerSets(string aspfile) {
+    system(string(clingo_cmd + " --project -q -n " + to_string(thresh) + " " + aspfile + "> result_" + aspfile).c_str());
+    ifstream resultfile("result_" + aspfile);
+
+    string line; 
+    uint64_t nModels = 0;
+    while (getline (resultfile, line)) {
+      if (line.find("Models") == 0) {
+        size_t pos = 0;
+        std::string token;
+        std::string delimiter = ":";
+        int atom = 0;
+        while ((pos = line.find(delimiter)) != std::string::npos) {
+          token = line.substr(0, pos);
+          line.erase(0, pos + delimiter.length());
+        }
+        nModels = stoull(line.substr(1));
+      }
+    }
+    return nModels;
   }
 
 
