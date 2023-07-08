@@ -163,6 +163,7 @@ private:
       first_par.insert(max_index);
     }
     int first_half = 0;
+    T n1 =0, n2= 0;
     vec<Var> first;
     vec<Var> second;
     for (int cp = 0 ; cp<nbComponent ; cp++) {
@@ -214,14 +215,14 @@ private:
           // no need to add the previously computed AS
           occManager->addConditioning(aspfile);
           occManager->addProject(aspfile, first);   // minimal models w.r.t. first set of variables
-          T n1 = occManager->enumerateAnswerSets(aspfile);
+          n1 = occManager->enumerateAnswerSets(aspfile);
           cout << "nModels1: " << n1 << endl;
 
           aspfile = occManager->computeASPProgram();
           // no need to add the previously computed AS
           occManager->addConditioning(aspfile);
           occManager->addProject(aspfile, second);  // minimal models w.r.t. second set of variables
-          T n2 = occManager->enumerateAnswerSets(aspfile);
+          n2 = occManager->enumerateAnswerSets(aspfile);
           cout << "nModels2: " << n2 << endl;
 
       }// else we have a tautology

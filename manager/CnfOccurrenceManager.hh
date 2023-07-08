@@ -211,7 +211,7 @@ public:
     return;
   }
 
-  void addProject(string aspfile, vec<Var> projSet) {
+  void addProject(string aspfile, vec<Var> &projSet) {
     ofstream myfile;
     myfile.open(aspfile);
     std::string body_str, head_str;
@@ -222,7 +222,7 @@ public:
     return;
   }
 
-  uint64_t enumerateAnswerSets(string aspfile) {
+  uint64_t enumerateAnswerSets(std::string aspfile) {
     system(string(clingo_cmd + " --project -q -n " + to_string(thresh) + " " + aspfile + "> result_" + aspfile).c_str());
     ifstream resultfile("result_" + aspfile);
 
