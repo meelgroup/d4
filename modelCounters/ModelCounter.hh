@@ -208,20 +208,22 @@ private:
 
             //   if(localCache) cache->addInCache(cb, curr);
             // }
-            occManager->popPreviousClauseSet();
+            //  occManager->popPreviousClauseSet();
             // to disable the counting
           }
           std::string aspfile = occManager->computeASPProgram();
           // no need to add the previously computed AS
-          occManager->addConditioning(aspfile);
-          occManager->addProject(aspfile, first);   // minimal models w.r.t. first set of variables
+          // check the quick fix
+          // occManager->addConditioning(aspfile);
+          // occManager->addProject(aspfile, first);   // minimal models w.r.t. first set of variables
           n1 = occManager->enumerateAnswerSets(aspfile);
           cout << "nModels1: " << n1 << endl;
 
           aspfile = occManager->computeASPProgram();
           // no need to add the previously computed AS
-          occManager->addConditioning(aspfile);
-          occManager->addProject(aspfile, second);  // minimal models w.r.t. second set of variables
+          // check the quick fix
+          // occManager->addConditioning(aspfile);
+          // occManager->addProject(aspfile, second);  // minimal models w.r.t. second set of variables
           n2 = occManager->enumerateAnswerSets(aspfile);
           cout << "nModels2: " << n2 << endl;
 
