@@ -202,6 +202,10 @@ int main(int argc, char *argv[])
  free(targetweights);
  free(partweights);
  free(partvec);
+ free(cwghts);
+ free(nwghts);
+ free(xpins);
+ free(pins);
   
 PaToH_Free();
 printf("\n");
