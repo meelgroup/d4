@@ -19,7 +19,7 @@
 #define MANAGER_CNF_OCCURRENCE_MANAGER
 
 #include <iostream>
-
+#include <unordered_map> 
 #include "../mtl/Alg.hh"
 #include "../mtl/Sort.hh"
 #include "../interfaces/OccurrenceManagerInterface.hh"
@@ -66,6 +66,7 @@ protected:
   }// resetUnMark
 
   int connectedToLit(Lit l, vec<int> &v, vec<Var> &varComponent, int nbComponent);
+  int connectedClauses(Lit l, unordered_map<Var, bool> &vmap, vec< vec<Lit> > &relClauses, vec<Var> &varComponent);
 
 public:
   CnfOccurrenceManager(int nbClause, int nbVar, int maxClauseSize);
@@ -73,6 +74,8 @@ public:
 
   int computeConnectedComponent(vec< vec<Var> > &varConnected, vec<Var> &setOfVar, vec<Var> &freeVar,
                                 vec<Var> &notFreeVar);
+
+  int computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Lit> > &clauses, vec<Var> &freeVar, vec<Var> &notFreeVar);
 
   inline void initFormula(vec<vec<Lit> > &_clauses)
   {

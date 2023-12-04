@@ -179,6 +179,82 @@ int CnfOccurrenceManager::computeConnectedComponent(vec< vec<Var> > &varCo, vec<
   // TODO: try to understand when nbComponent == 0
 }// computeConnectedComponent
 
+/**
+   @param[in] l, the considered literal
+   WARNING: varConnected references tmpVecVar. Thus, it is already allocate.
+*/
+int CnfOccurrenceManager::connectedClauses(Lit l, unordered_map<Var, bool> &vmap, vec< vec<Lit> > &relClauses, vec<Var> &varComponent)
+{
+  int cpt = 0;
+  vec<int> &occp = occList[toInt(l)];
+  for (int i = 0; i < occp.size(); i++)
+  {
+    vec<Lit> &c = clauses[occp[i]];
+    if (markView[occp[i]])
+      continue;
+    markView[occp[i]] = true;
+    mustUnMark.push_(occp[i]);
+    relClauses.push();
+    cpt += 1;
+
+    // compute residual clauses
+    for (int j = 0; j < c.size(); j++)
+    {
+      if (currentValue[var(c[j])] != l_Undef)
+        continue;
+      relClauses.last().push(c[j]);
+      Var vTmp = var(c[j]);
+      if(vmap.find(vTmp) == vmap.end())
+      {
+        varComponent.push_(vTmp);
+        vmap[vTmp] = true;
+      }
+    }
+  }
+  return cpt;
+} // connectedClauses
+
+/**
+   Look all the formula in order to compute the connected component
+   of the formula.
+
+   @param[out] varCo, the different connected components found
+   @param[in] setOfVar, the current set of variables
+   @param[out] freeVar, the set of variables that are present in setOfVar but not in the problem anymore
+   @param[out] notFreeVar, the difference between setOfVar and freeVar
+
+   \return the number of component found
+ */
+int CnfOccurrenceManager::computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Lit> > &relClauses, 
+                          vec<Var> &freeVar, vec<Var> &notFreeVar)
+{
+  freeVar.clear();
+  notFreeVar.clear();
+  int nbClauses = 0;
+  int nbComponent = 1; 
+  unordered_map<Var, bool> vmap; 
+  
+  for(int i = 0 ; i<setOfVar.size() ; i++)
+  {
+    Var v = setOfVar[i];
+    assert(currentValue[v] == l_Undef);
+
+    tmpVecVar.setSize(0);
+    tmpVecVar.push_(v);
+    vmap[v] = true;
+
+    for (int pos = 0; pos < tmpVecVar.size(); pos++)
+    {
+      Lit l = mkLit(tmpVecVar[pos], false);
+      nbClauses += connectedClauses(l, vmap, relClauses, tmpVecVar);
+      nbClauses += connectedClauses(~l, vmap, relClauses, tmpVecVar);
+    }
+  }
+
+  resetUnMark();
+  return nbClauses; 
+  // TODO: try to understand when nbComponent == 0
+}// computeConnectedComponent
 
 /**
    Test if a given clause is actually satisfied under the current

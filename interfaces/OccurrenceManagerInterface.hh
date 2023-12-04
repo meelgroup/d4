@@ -55,6 +55,10 @@ public:
 
   virtual int computeConnectedComponent(vec<vec<Var> > &varConnected, vec<Var> &setOfVar,
                                         vec<Var> &freeVar, vec<Var> &notFreeVar) = 0;
+  
+  virtual int computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Lit> > &clauses, 
+                                        vec<Var> &freeVar, vec<Var> &notFreeVar) = 0;
+
   virtual void preUpdate(vec<Lit> &lits) = 0;
   virtual void postUpdate(vec<Lit> &lits) = 0;
   virtual void initialize(vec<Var> &setOfVar, vec<Lit> &units) = 0;

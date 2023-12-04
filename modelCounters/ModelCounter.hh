@@ -147,18 +147,18 @@ private:
     vec<Var> reallyPresent;
     vec< vec<Var> > varConnected;
     int nbComponent = occManager->computeConnectedComponent(varConnected, setOfVar, freeVariable, reallyPresent);
-    bool earlyReject = true;
-    if (earlyReject) {
-      bool hasIntersection = true;
-      for(int cp = 0 ; cp<nbComponent ; cp++) {
-        vec<Var> &connected = varConnected[cp];
-        hasIntersection &= hasPriorityVariables(connected, priorityVar);
-      }
-      if (!hasIntersection) {
-        occManager->postUpdate(unitsLit); // I think it should be there
-        return 0; // the number of stable models is 0
-      }
-    }
+    // bool earlyReject = true;
+    // if (earlyReject) {
+    //   bool hasIntersection = true;
+    //   for(int cp = 0 ; cp<nbComponent ; cp++) {
+    //     vec<Var> &connected = varConnected[cp];
+    //     hasIntersection &= hasPriorityVariables(connected, priorityVar);
+    //   }
+    //   if (!hasIntersection) {
+    //     occManager->postUpdate(unitsLit); // I think it should be there
+    //     return 0; // the number of stable models is 0
+    //   }
+    // }
     T ret = 1, curr;
     if(nbComponent)
       {
@@ -214,6 +214,13 @@ private:
     // for (int i = 0; i < priorityVar.size() ; i++) {
     //   cout << priorityVar[i] << " ";
     // }
+    vec<Var> nonCopyVar, copyVar;
+    vec< vec<Lit> > relClauses;
+    int nCls = 0;
+    if (priorityVar.size() == 0) {
+      nCls = occManager->computeRelevantClauses(connected, relClauses, copyVar, nonCopyVar);
+      cout << "Number of clauses in residual formula: " << nCls << endl;
+    }
 
     if(priorityVar.size() == 0 && connected.size() > 0) {
       // it is the special base cases
