@@ -189,6 +189,32 @@ private:
     return ret;
   }// computeNbModel_
 
+  unsigned callBaselineSolver(string aspfile) {
+    // running clingo to compute minimal models
+    string clingo_cmd = "clingo ";
+    system(string(clingo_cmd + " -q -n 0 " + aspfile + "> result_" + aspfile).c_str());
+    ifstream resultfile("result_" + aspfile);
+    string line; 
+    bool solutionFound = false;
+    unsigned nSoln = 0;
+    while (getline (resultfile, line)) {
+      if (line.find("Models") == 0) {
+        solutionFound = true;
+        size_t pos = 0;
+        std::string token;
+        std::string delimiter = ":";
+        pos = line.find(delimiter);
+        token = line.substr(pos + delimiter.length(), line.length());
+        nSoln = stoul(token);
+      }
+    }
+    if (solutionFound) {
+      return nSoln;
+    }
+    cout << "Cannot find solutions " << endl;
+    return nSoln;
+  }
+
   /**
      This function select a variable and compile a decision node.
 
@@ -219,6 +245,9 @@ private:
     int nCls = 0;
     string rule_str = "";
     if (priorityVar.size() == 0) {
+      ofstream myfile;
+      string aspfile = "asp.lp";
+      myfile.open(aspfile);
       nCls = occManager->computeRelevantClauses(connected, relClauses, copyVar, nonCopyVar);
       // cout << "Number of clauses in residual formula: " << nCls << endl;
       cout << "The rules of residual program: (" << nCls << ")" << endl;
@@ -249,32 +278,33 @@ private:
           }
         }
         rule_str += ".";
-        cout << rule_str << endl;
+        myfile << rule_str << endl;
       }
       unordered_map<Var, bool> priorityVarPresent;
-      cout << "The projection variables: (" << priorityVar.size() << ")" << endl;
+      // cout << "The projection variables: (" << priorityVar.size() << ")" << endl;
       for (int pv = 0 ; pv<priorityVar.size() ; pv++) {
         // cout << readableVar(priorityVar[pv]) << " ";
         assert(priorityVar[pv] >= 0);
         priorityVarPresent[priorityVar[pv] + s.nVars() / 2] = true;
         // it should be +1
       }
-      cout << "The conditionals: " << endl;
+      // cout << "The conditionals: " << endl;
       for (int pv = 0 ; pv<connected.size() ; pv++) {
         Var v = connected[pv];
         rule_str = "";
         if (priorityVarPresent.find(v) == priorityVarPresent.end()) {
           rule_str += ":- not " + ("v" + to_string(v)) + ".";
-          cout << rule_str << endl;
+          myfile << rule_str << endl;
         }
       }
-      cout << endl;
+      T nSoln = callBaselineSolver(aspfile);
+      return nSoln;
     }
 
-    if(priorityVar.size() == 0 && connected.size() > 0) {
-      // it is the special base cases
-      return 0;
-    }
+    // if(priorityVar.size() == 0 && connected.size() > 0) {
+    //   // it is the special base cases
+    //   return 0;
+    // }
     if(v == var_Undef) return 1; 
 
     Lit l = mkLit(v, optReversePolarity - vs->selectPhase(v));
