@@ -217,29 +217,55 @@ private:
     vec<Var> nonCopyVar, copyVar;
     vec< vec<Lit> > relClauses;
     int nCls = 0;
+    string rule_str = "";
     if (priorityVar.size() == 0) {
       nCls = occManager->computeRelevantClauses(connected, relClauses, copyVar, nonCopyVar);
       // cout << "Number of clauses in residual formula: " << nCls << endl;
       cout << "The rules of residual program: (" << nCls << ")" << endl;
-      for(int cp = 0 ; cp<nCls ; cp++) {
+      vec<Var> pos_lit, neg_lit;
+      for(int cp = 0 ; cp < nCls ; cp++) {
         vec<Lit> &c = relClauses[cp];
+        pos_lit.clear();
+        neg_lit.clear();
         for (int in = 0; in < c.size(); in++) {
-          cout << readableLit(c[in]) << " ";
+          if (sign(c[in])) {
+            neg_lit.push_(var(c[in]));
+          } else {
+            pos_lit.push_(var(c[in]));
+          }
         }
-        cout << " 0" << endl;
+        rule_str = "";
+        for (int lit_in = 0; lit_in < pos_lit.size(); lit_in++) {
+          rule_str += ("v" + to_string(pos_lit[lit_in]));
+          if (lit_in < pos_lit.size() - 1) {
+            rule_str += ";";
+          }
+        }
+        rule_str += ":-";
+        for (int lit_in = 0; lit_in < neg_lit.size(); lit_in++) {
+          rule_str += ("v" + to_string(neg_lit[lit_in]));
+          if (lit_in < neg_lit.size() - 1) {
+            rule_str += ",";
+          }
+        }
+        rule_str += ".";
+        cout << rule_str << endl;
       }
       unordered_map<Var, bool> priorityVarPresent;
       cout << "The projection variables: (" << priorityVar.size() << ")" << endl;
       for (int pv = 0 ; pv<priorityVar.size() ; pv++) {
-        cout << readableVar(priorityVar[pv]) << " ";
+        // cout << readableVar(priorityVar[pv]) << " ";
+        assert(priorityVar[pv] >= 0);
         priorityVarPresent[priorityVar[pv] + s.nVars() / 2] = true;
         // it should be +1
       }
       cout << "The conditionals: " << endl;
       for (int pv = 0 ; pv<connected.size() ; pv++) {
         Var v = connected[pv];
+        rule_str = "";
         if (priorityVarPresent.find(v) == priorityVarPresent.end()) {
-          cout << readableVar(v) << " ";
+          rule_str += ":- not " + ("v" + to_string(v)) + ".";
+          cout << rule_str << endl;
         }
       }
       cout << endl;
@@ -483,7 +509,7 @@ public:
         // copying the projection variables
         priorityVar.push(i);
         // for projection var v the corresponding copy var is v + s.nVars() / 2
-        cout << "Projection var: " << i+1 << " and copy var " << (i+1) + s.nVars() / 2;
+        cout << "Projection var: " << i+1 << " and copy var " << (i+1) + s.nVars() / 2 << endl;
       }
     }
     cout << endl;
