@@ -194,9 +194,15 @@ int CnfOccurrenceManager::connectedClauses(Lit l, unordered_map<Var, bool> &vmap
       continue;
     markView[occp[i]] = true;
     mustUnMark.push_(occp[i]);
+    for (int j = 0; j < c.size(); j++) 
+    {
+      if (var(c[j]) <= nbVar / 2) {
+        // ignore the clause as it contains projection variables
+        break;
+      }
+    }
     relClauses.push();
     cpt += 1;
-
     // compute residual clauses
     for (int j = 0; j < c.size(); j++)
     {

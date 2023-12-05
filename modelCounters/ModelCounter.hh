@@ -219,7 +219,30 @@ private:
     int nCls = 0;
     if (priorityVar.size() == 0) {
       nCls = occManager->computeRelevantClauses(connected, relClauses, copyVar, nonCopyVar);
-      cout << "Number of clauses in residual formula: " << nCls << endl;
+      // cout << "Number of clauses in residual formula: " << nCls << endl;
+      cout << "The rules of residual program: (" << nCls << ")" << endl;
+      for(int cp = 0 ; cp<nCls ; cp++) {
+        vec<Lit> &c = relClauses[cp];
+        for (int in = 0; in < c.size(); in++) {
+          cout << readableLit(c[in]) << " ";
+        }
+        cout << " 0" << endl;
+      }
+      unordered_map<Var, bool> priorityVarPresent;
+      cout << "The projection variables: (" << priorityVar.size() << ")" << endl;
+      for (int pv = 0 ; pv<priorityVar.size() ; pv++) {
+        cout << readableVar(priorityVar[pv]) << " ";
+        priorityVarPresent[priorityVar[pv] + s.nVars() / 2] = true;
+        // it should be +1
+      }
+      cout << "The conditionals: " << endl;
+      for (int pv = 0 ; pv<connected.size() ; pv++) {
+        Var v = connected[pv];
+        if (priorityVarPresent.find(v) == priorityVarPresent.end()) {
+          cout << readableVar(v) << " ";
+        }
+      }
+      cout << endl;
     }
 
     if(priorityVar.size() == 0 && connected.size() > 0) {
@@ -459,7 +482,8 @@ public:
       if (vs->isProjected(i)) {
         // copying the projection variables
         priorityVar.push(i);
-        cout << i+1 << " ";
+        // for projection var v the corresponding copy var is v + s.nVars() / 2
+        cout << "Projection var: " << i+1 << " and copy var " << (i+1) + s.nVars() / 2;
       }
     }
     cout << endl;
