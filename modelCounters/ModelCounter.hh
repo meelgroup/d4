@@ -258,9 +258,9 @@ private:
         neg_lit.clear();
         for (int in = 0; in < c.size(); in++) {
           if (sign(c[in])) {
-            neg_lit.push_(var(c[in]));
+            neg_lit.push(var(c[in]));
           } else {
-            pos_lit.push_(var(c[in]));
+            pos_lit.push(var(c[in]));
           }
         }
         rule_str = "";
@@ -292,11 +292,12 @@ private:
       for (int pv = 0 ; pv<connected.size() ; pv++) {
         Var v = connected[pv];
         rule_str = "";
-        if (priorityVarPresent.find(v) == priorityVarPresent.end()) {
+        if (readableVar(v) <= s.nVars() / 2 && priorityVarPresent.find(v) == priorityVarPresent.end()) {
           rule_str += ":- not " + ("v" + to_string(v)) + ".";
           myfile << rule_str << endl;
         }
       }
+      // calling the baseline solver to enumerate minimal models
       T nSoln = callBaselineSolver(aspfile);
       return nSoln;
     }

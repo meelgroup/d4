@@ -197,7 +197,7 @@ int CnfOccurrenceManager::connectedClauses(Lit l, unordered_map<Var, bool> &vmap
     bool toAdd = true;
     for (int j = 0; j < c.size(); j++) 
     {
-      if (var(c[j]) <= nbVar / 2) {
+      if (readableVar(var(c[j])) <= nbVar / 2) {
         // ignore the clause as it contains projection variables
         toAdd = false;
         break;
