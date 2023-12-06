@@ -244,7 +244,7 @@ private:
     vec< vec<Lit> > relClauses;
     int nCls = 0;
     string rule_str = "";
-    if (priorityVar.size() == 0) {
+    if (priorityVar.size() <= 10) {
       ofstream myfile;
       string aspfile = "asp.lp";
       myfile.open(aspfile);
@@ -292,7 +292,7 @@ private:
       for (int pv = 0 ; pv<connected.size() ; pv++) {
         Var v = connected[pv];
         rule_str = "";
-        if (readableVar(v) <= s.nVars() / 2 && priorityVarPresent.find(v) == priorityVarPresent.end()) {
+        if (readableVar(v) > s.nVars() / 2 && priorityVarPresent.find(v) == priorityVarPresent.end()) {
           rule_str += ":- not " + ("v" + to_string(v)) + ".";
           myfile << rule_str << endl;
         }
