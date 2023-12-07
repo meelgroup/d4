@@ -275,6 +275,68 @@ int CnfOccurrenceManager::computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Li
 
    \return true if the clause is satisfied, false otherwise.
  */
+
+bool CnfOccurrenceManager::checkHeuristics(vec<Var> &setOfVar, int thresh) 
+{
+  unordered_map<Var, bool> vmap; 
+  bool isLeafNode = true;
+  int numberofDisjuction = 0;
+  for(int i = 0 ; i<setOfVar.size() && isLeafNode; i++)
+  {
+    Var v = setOfVar[i];
+    assert(currentValue[v] == l_Undef);
+    if (vmap.find(v) != vmap.end())
+      continue;
+    tmpVecVar.setSize(0);
+    tmpVecVar.push_(v);
+    vmap[v] = true;
+
+    for (int pos = 0; pos < tmpVecVar.size() && isLeafNode; pos++)
+    {
+      Lit l = mkLit(tmpVecVar[pos], false);
+      // clause where v comes as positive literal
+      vec<int> &occp = occList[toInt(l)];
+      for (int i = 0; i < occp.size() && isLeafNode; i++)
+      {
+        vec<Lit> &c = clauses[occp[i]];
+        if (markView[occp[i]])
+          continue;
+        markView[occp[i]] = true;
+        mustUnMark.push_(occp[i]);
+        int sizeofHead = 0;
+        bool original_program = true;
+        for (int j = 0; j < c.size(); j++)
+        {
+          if (readableVar(var(c[j])) > nbVar / 2) {
+            original_program = false;
+            sizeofHead = 0;
+            break;
+          } 
+          if (currentValue[var(c[j])] != l_Undef)
+            continue;
+          else if (!sign(c[j])) {
+            sizeofHead += 1;
+          }
+          Var vTmp = var(c[j]);
+          if (vmap.find(vTmp) == vmap.end()) {
+            tmpVecVar.push_(vTmp);
+            vmap[vTmp] = true;
+          }
+        }
+        if (original_program && sizeofHead > 1) {
+          // more than one disjunction 
+          numberofDisjuction += sizeofHead;
+          if (numberofDisjuction > thresh) {
+            // if more than certain number of disjunctions, then it is not a leaf node
+            isLeafNode = false;
+          }
+        }
+      }
+    }
+  }
+  resetUnMark();
+  return isLeafNode;
+}
 inline bool CnfOccurrenceManager::isSatisfiedClause(int idx)
 {
   assert(idx < clauses.size());

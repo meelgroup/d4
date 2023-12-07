@@ -244,7 +244,9 @@ private:
     vec< vec<Lit> > relClauses;
     int nCls = 0;
     string rule_str = "";
-    if (priorityVar.size() <= 10) {
+    int thresh = 40;
+    bool hasSmallModels = occManager->checkHeuristics(priorityVar, thresh);
+    if (hasSmallModels) {
       ofstream myfile;
       string aspfile = "asp.lp";
       myfile.open(aspfile);

@@ -58,6 +58,7 @@ public:
   
   virtual int computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Lit> > &clauses, 
                                         vec<Var> &freeVar, vec<Var> &notFreeVar) = 0;
+  virtual bool checkHeuristics(vec<Var> &setOfVar, int thresh) = 0;
 
   virtual void preUpdate(vec<Lit> &lits) = 0;
   virtual void postUpdate(vec<Lit> &lits) = 0;

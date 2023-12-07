@@ -77,6 +77,7 @@ public:
 
   int computeRelevantClauses(vec<Var> &setOfVar, vec< vec<Lit> > &clauses, vec<Var> &freeVar, vec<Var> &notFreeVar);
 
+  bool checkHeuristics(vec<Var> &setOfVar, int thresh);
   inline void initFormula(vec<vec<Lit> > &_clauses)
   {
     clauses.clear();
