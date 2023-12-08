@@ -192,7 +192,7 @@ private:
   unsigned callBaselineSolver(string aspfile) {
     // running clingo to compute minimal models
     string clingo_cmd = "clingo ";
-    system(string(clingo_cmd + " -q -n 0 " + aspfile + "> result_" + aspfile).c_str());
+    system(string(clingo_cmd + " -q -n 0 -W none " + aspfile + "> result_" + aspfile).c_str());
     ifstream resultfile("result_" + aspfile);
     string line; 
     bool solutionFound = false;
