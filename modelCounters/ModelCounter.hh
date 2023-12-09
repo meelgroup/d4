@@ -82,6 +82,7 @@ private:
 
   VariableHeuristicInterface *vs;
   PartitionerInterface *pv;
+  const char *clingoPath;
 
   BucketManagerInterface<T> *bm;
   EquivManager em;
@@ -191,7 +192,7 @@ private:
 
   unsigned callBaselineSolver(string aspfile) {
     // running clingo to compute minimal models
-    string clingo_cmd = "clingo ";
+    string clingo_cmd = string(clingoPath);
     system(string(clingo_cmd + " -q -n 0 -W none " + aspfile + "> result_" + aspfile).c_str());
     ifstream resultfile("result_" + aspfile);
     string line; 
@@ -376,6 +377,7 @@ private:
     callPartitioner = callEquiv = 0;
     optCached = optList.optCache;
     optReversePolarity = optList.reversePolarity;
+    clingoPath = optList.clingoPath;
 
     optList.printOptions();
 
