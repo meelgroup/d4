@@ -36,13 +36,14 @@ public:
 
   const char *cacheStore;
   const char *varHeuristic;
+  const char *clingoPath;
   const char *phaseHeuristic;
   const char *partitionHeuristic;
   const char *cacheRepresentation;
 
   OptionManager(int _optCache, bool _optAnd, bool _reversePolarity, bool _reducePrimalGraph,
                 bool _equivSimplification, const char *_cacheStore, const char *_varHeuristic,
-                const char *_phaseHeuristic, const char *_partitionHeuristic,
+                const char *_clingoPath, const char *_phaseHeuristic, const char *_partitionHeuristic,
                 const char *_cacheRepresentation, int rdCache, int strCache, int frqLimit)
   {
     freqLimitDyn = frqLimit;
@@ -56,6 +57,7 @@ public:
     equivSimplification = _equivSimplification;
 
     varHeuristic = _varHeuristic;
+    clingoPath = _clingoPath;
     phaseHeuristic = _phaseHeuristic;
     partitionHeuristic = _partitionHeuristic;
     cacheStore = _cacheStore;
@@ -70,6 +72,7 @@ public:
     printf("c Cache representation: %s\n", cacheRepresentation);
     printf("c Part of the formula that is cached: %s\n", cacheStore);
     printf("c Variable heuristic: %s\n", varHeuristic);
+    printf("c The clingo path: %s\n", clingoPath);
     printf("c Phase heuristic: %s%s\n", (reversePolarity) ? "reverse " : "", phaseHeuristic);
     printf("c Partitioning heuristic: %s%s%s\n", partitionHeuristic,
            (reducePrimalGraph) ? " + graph reduction" : "",

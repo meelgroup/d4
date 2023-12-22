@@ -73,7 +73,7 @@ template<typename T> void modelCounting(vec<vec<Lit> > &clauses, vec<double> &we
 {
   ModelCounter<T> *tmp = new ModelCounter<T>(clauses, weightLit, optList, isProjectedVar);
   T d = tmp->computeNbModel();
-  cout << std::fixed << "s " << d << endl;
+  cout << std::fixed << "Minimal Models " << d << endl;
   delete tmp;
 }// modelCounting
 
@@ -219,6 +219,7 @@ int main(int argc, char** argv)
                 "Define which part of the formula is cached: ALL, NB (no binary), NT (no touche)\n",
                 "NT");
   StringOption cacheRepresentation("MAIN", "cr", "CL\n", "CL");
+  StringOption clingoPath("MAIN", "cp", "Specify the clingo path\n", "clingo");
   StringOption varHeuristic("MAIN", "vh", "Heuristic implemented: VSADS, VSIDS, DLCS, JW-TS, MOM\n", "VSADS");
   StringOption phaseHeuristic("MAIN", "ph", "Heuristic implemented: TRUE, FALSE, POLARITY, OCCURRENCE\n", "TRUE");
   StringOption partitionHeuristic("MAIN", "pv",
@@ -253,7 +254,7 @@ int main(int argc, char** argv)
   ofstream dratOut{dratOutput};
   if (!dratOut.is_open()) printf("c WARNING! Could not write output drat file %s?\n", (const char *) dratOutput);
 
-  OptionManager optList(optCache, optAnd, rPolarity, reducePrimalGraph, equivSimp, cacheStore, varHeuristic,
+  OptionManager optList(optCache, optAnd, rPolarity, reducePrimalGraph, equivSimp, cacheStore, varHeuristic, clingoPath,
                         phaseHeuristic, partitionHeuristic, cacheRepresentation, reduceCache,
                         strategyRedCache, freqLimitDyn);
 
