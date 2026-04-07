@@ -1,6 +1,8 @@
 Authors: Lagniez Jean-Marie
 Date: 2017/07/09
 
+**This is the modified codebase of SharpSAT-TD. We modified it for SharpASP. Do not use it for propositional model counting**.
+
 # How to compile
 
 To compile and print out the help please use the following command lines:
