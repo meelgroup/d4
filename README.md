@@ -1,7 +1,7 @@
-Authors: Lagniez Jean-Marie
-Date: 2017/07/09
+Authors: Lagniez Jean-Marie (modified by Mahi)
+Date: 2026/04/10
 
-**This is the modified codebase of SharpSAT-TD. We modified it for SharpASP. Do not use it for propositional model counting**.
+**This is the modified codebase of D4. We modified it for SharpASP. Do not use it for #SAT**.
 
 # How to compile
 
