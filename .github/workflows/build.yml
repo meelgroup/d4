@@ -20,3 +20,6 @@ jobs:
       - name: Build
         run: make
 
+      - name: Help
+        run: ./d4 --help
+
