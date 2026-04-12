@@ -1,0 +1,22 @@
+name: CI Build
+
+on:
+  push:
+    branches: [asp]
+  pull_request:
+    branches: [asp]
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y build-essential libgmp-dev
+
+      - name: Build
+        run: make
+
