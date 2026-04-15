@@ -1,5 +1,5 @@
 ROOTDIR    = .
-EXEC      ?= d4
+EXEC      ?= d4_bin
 MROOT      = .
 
 CSRCS      = $(wildcard *.cc */*.cc)
